@@ -1,6 +1,23 @@
 set encoding=utf-8
 scriptencoding utf-8
 
+"{ vim-plug plugins
+" Activate vim-plug plugin
+call plug#begin('~/.vim/plugged')
+Plug 'vimwiki/vimwiki'
+Plug 'tbabej/taskwiki'
+Plug 'plasticboy/vim-markdown'
+" Plug 'tomasr/molokai'
+call plug#end()
+
+" set linebreak
+if has("autocmd")
+  filetype plugin indent on
+endif
+
+" Activate man page plugin
+"}
+
 "{ Builtin optional plugins
 " Activate matchit plugin
 runtime! macros/matchit.vim
@@ -10,6 +27,16 @@ runtime! ftplugin/man.vim
 "}
 
 "{ Builtin options and settings
+set nocompatible
+set smarttab
+set cindent
+
+syntax on
+" colorscheme molokai
+
+hi Normal guibg=NONE ctermbg=NONE
+set termguicolors
+
 if !has('nvim')
     " Change cursor shapes based on whether we are in insert mode,
     " see https://vi.stackexchange.com/questions/9131/i-cant-switch-to-cursor-in-insert-mode
@@ -56,8 +83,11 @@ set noswapfile
 
 " General tab settings
 set tabstop=4       " number of visual spaces per TAB
+" set tabstop=2
 set softtabstop=4   " number of spaces in tab when editing
 set shiftwidth=4    " number of spaces to use for autoindent
+" set shiftwidth=2
+" always uses spaces instead of tab characters
 set expandtab       " expand tab to spaces so that tabs are spaces
 
 " Set matching pairs of characters and highlight matching brackets
@@ -249,6 +279,27 @@ let g:loaded_netrwPlugin = 1
 " Do not load tohtml.vim
 let g:loaded_2html_plugin = 1
 "}
+
+"{ Variables Plugins
+
+"{{ VimWiki
+" vimwiki normal behavior
+let g:vimwiki_list = [{'path': '~/vimwiki/', 'auto_diary_index': 1}]
+
+" vimwiki config markdown
+" let g:vimwiki_list = [{'path':'/tmp/vimwiki', 'syntax': 'markdown', 'ext': '.md'}]
+" let g:vimwiki_ext2syntax = {'.md': 'markdown', '.markdown': 'markdown', '.mdown': 'markdown'}
+
+" Makes vimwiki markdown links as [text](text.md) instead of [text](text)
+" let g:vimwiki_markdown_link_ext = 1
+
+" let g:taskwiki_markup_syntax = 'markdown'
+" let g:markdown_folding = 1
+"}}
+
+"}
+
+
 
 
 "{ Auto commands
