@@ -13,6 +13,15 @@ Plug 'vimwiki/vimwiki'
 " Plug 'tbabej/taskwiki'
 Plug 'plasticboy/vim-markdown'
 " Plug 'tomasr/molokai'
+" from Luke
+Plug 'tpope/vim-surround'
+Plug 'preservim/nerdtree'
+Plug 'junegunn/goyo.vim'
+Plug 'jreybert/vimagit'
+Plug 'lukesmithxyz/vimling'
+Plug 'vimwiki/vimwiki'
+Plug 'tpope/vim-commentary'
+Plug 'ap/vim-css-color'
 call plug#end()
 
 if has("autocmd")
@@ -54,6 +63,10 @@ endif
 
 filetype plugin indent on
 syntax enable
+
+set go=a
+set mouse=a
+set nohlsearch
 
 " Set height of status line
 set laststatus=2
@@ -111,13 +124,15 @@ set linebreak
 set showbreak=↪
 
 " List all items and start selecting matches in cmd completion
-set wildmode=list:full
+" set wildmode=list:full
+" Enable autocompletion:
+set wildmode=longest,list,full
 
 " Show current line where the cursor is
 set cursorline
 
 " Set a ruler at column 80, see https://stackoverflow.com/q/2447109/6064933
-set colorcolumn=80
+" set colorcolumn=80
 
 " Minimum lines to keep above and below cursor when scrolling
 set scrolloff=3
@@ -269,6 +284,27 @@ function! MyFoldText()
     let fillcharcount = &textwidth - len(line_text) - len(folded_line_num) - 10
     return '+'. repeat('-', 4) . line_text . repeat('.', fillcharcount) . ' ('. folded_line_num . ' L)'
 endfunction
+
+" Function for toggling the bottom statusbar:
+let s:hidden_all = 1
+function! ToggleHiddenAll()
+    if s:hidden_all  == 0
+        let s:hidden_all = 1
+        set noshowmode
+        set noruler
+        set laststatus=0
+        set noshowcmd
+    else
+        let s:hidden_all = 0
+        set showmode
+        set ruler
+        set laststatus=2
+        set showcmd
+    endif
+endfunction
+nnoremap <leader>h :call ToggleHiddenAll()<CR>
+
+
 "}
 
 "{ Variables
@@ -290,19 +326,49 @@ let g:loaded_2html_plugin = 1
 
 " vimwiki config markdown
 let g:vimwiki_list = [{'path':'~/Documents/vimwikiMD', 'syntax': 'markdown', 'ext': '.md'}]
-let g:vimwiki_ext2syntax = {'.md': 'markdown', '.markdown': 'markdown', '.mdown': 'markdown'}
+let g:vimwiki_ext2syntax = {'.Rmd': 'markdown', '.rmd': 'markdown','.md': 'markdown', '.markdown': 'markdown', '.mdown': 'markdown'}
 
 " Makes vimwiki markdown links as [text](text.md) instead of [text](text)
 let g:vimwiki_markdown_link_ext = 1
 
 let g:taskwiki_markup_syntax = 'markdown'
 let g:markdown_folding = 1
+
+" Ensure files are read as what I want:
+map <leader>v :VimwikiIndex
+autocmd BufRead,BufNewFile /tmp/calcurse*,~/.calcurse/notes/* set filetype=markdown
+autocmd BufRead,BufNewFile *.ms,*.me,*.mom,*.man set filetype=groff
+autocmd BufRead,BufNewFile *.tex set filetype=tex
+
 "
+" Nerd tree
+map <leader>n :NERDTreeToggle<CR>
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+if has('nvim')
+    let NERDTreeBookmarksFile = stdpath('data') . '/NERDTreeBookmarks'
+else
+    let NERDTreeBookmarksFile = '~/.vim' . '/NERDTreeBookmarks'
+endif
+"
+" vimling:
+nm <leader><leader>d :call ToggleDeadKeys()<CR>
+imap <leader><leader>d <esc>:call ToggleDeadKeys()<CR>a
+nm <leader><leader>i :call ToggleIPA()<CR>
+imap <leader><leader>i <esc>:call ToggleIPA()<CR>a
+nm <leader><leader>q :call ToggleProse()<CR>
+
+" Open my bibliography file in split
+map <leader>b :vsp<space>$BIB<CR>
+map <leader>r :vsp<space>$REFER<CR>
+
+" Goyo
+" Enable Goyo by default for mutt writing
+autocmd BufRead,BufNewFile /tmp/neomutt* let g:goyo_width=80
+autocmd BufRead,BufNewFile /tmp/neomutt* :Goyo | set bg=light
+autocmd BufRead,BufNewFile /tmp/neomutt* map ZZ :Goyo\|x!<CR>
+autocmd BufRead,BufNewFile /tmp/neomutt* map ZQ :Goyo\|q!<CR>
 
 "}
-
-
-
 
 "{ Auto commands
 " Do not use smart case in command line mode,
@@ -370,6 +436,16 @@ augroup number_toggle
     autocmd BufEnter,FocusGained,InsertLeave,WinEnter * if &number | set relativenumber | endif
     autocmd BufLeave,FocusLost,InsertEnter,WinLeave * if &number | set norelativenumber | endif
 augroup END
+
+" Runs a script that cleans out tex build files whenever I close out of a .tex file.
+autocmd VimLeave *.tex !texclear %
+
+" Automatically deletes all trailing whitespace and newlines at end of file on save.
+autocmd BufWritePre * %s/\s\+$//e
+autocmd BufWritePre * %s/\n\+\%$//e
+autocmd BufWritePre *.[ch] %s/\%$/\r/e
+
+autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 "}
 
 "{ Custom key mappings
@@ -543,6 +619,33 @@ nnoremap <up> :echoerr "Don't use arrow keys, use H, J, K, L instead!"<CR>
 nnoremap <down> :echoerr "Don't use arrow keys, use H, J, K, L instead!"<CR>
 nnoremap <right> :echoerr "Don't use arrow keys, use H, J, K, L instead!"<CR>
 nnoremap <left> :echoerr "Don't use arrow keys, use H, J, K, L instead!"<CR>
+
+" Shortcutting split navigation, saving a keypress:
+map <C-h> <C-w>h
+map <C-j> <C-w>j
+map <C-k> <C-w>k
+map <C-l> <C-w>l
+
+" Replace ex mode with gq
+map Q gq
+
+" Check file in shellcheck:
+map <leader>s :!clear && shellcheck -x %<CR>
+
+" Replace all is aliased to S.
+nnoremap S :%s//g<Left><Left>
+
+" Compile document, be it groff/LaTeX/markdown/etc.
+map <leader>c :w! \| !compiler "<c-r>%"<CR>
+
+" Open corresponding .pdf/.html or preview
+map <leader>p :!opout <c-r>%<CR><CR>
+
+" Save file as sudo on files that require root permission
+cnoremap w!! execute 'silent! write !sudo tee % >/dev/null' <bar> edit!
+
+" Spell-check set to <leader>o, 'o' for 'orthography':
+map <leader>o :setlocal spell! spelllang=en_us<CR>
 "}
 
 "{ UI settings
