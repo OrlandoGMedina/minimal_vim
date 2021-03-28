@@ -8,7 +8,7 @@ scriptencoding utf-8
 " - For Neovim: stdpath('data') . '/plugged'
 " - Avoid using standard Vim directory names like 'plugin'
 call plug#begin('~/.vim/plugged')
-" Make sure you use single quotes 
+" Make sure you use single quotes
 Plug 'vimwiki/vimwiki'
 " Plug 'tbabej/taskwiki'
 Plug 'plasticboy/vim-markdown'
@@ -19,7 +19,6 @@ Plug 'preservim/nerdtree'
 Plug 'junegunn/goyo.vim'
 Plug 'jreybert/vimagit'
 Plug 'lukesmithxyz/vimling'
-Plug 'vimwiki/vimwiki'
 Plug 'tpope/vim-commentary'
 Plug 'ap/vim-css-color'
 call plug#end()
