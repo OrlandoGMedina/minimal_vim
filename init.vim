@@ -3,19 +3,21 @@ scriptencoding utf-8
 
 "{ vim-plug plugins
 " Activate vim-plug plugin
+
+" Specify a directory for plugins
+" - For Neovim: stdpath('data') . '/plugged'
+" - Avoid using standard Vim directory names like 'plugin'
 call plug#begin('~/.vim/plugged')
+" Make sure you use single quotes 
 Plug 'vimwiki/vimwiki'
 Plug 'tbabej/taskwiki'
 Plug 'plasticboy/vim-markdown'
 " Plug 'tomasr/molokai'
 call plug#end()
 
-" set linebreak
 if has("autocmd")
   filetype plugin indent on
 endif
-
-" Activate man page plugin
 "}
 
 "{ Builtin optional plugins
