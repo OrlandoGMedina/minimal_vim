@@ -10,7 +10,7 @@ scriptencoding utf-8
 call plug#begin('~/.vim/plugged')
 " Make sure you use single quotes 
 Plug 'vimwiki/vimwiki'
-Plug 'tbabej/taskwiki'
+" Plug 'tbabej/taskwiki'
 Plug 'plasticboy/vim-markdown'
 " Plug 'tomasr/molokai'
 call plug#end()
