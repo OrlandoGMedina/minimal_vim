@@ -132,7 +132,8 @@ endif
 
 "{{ FZF related plugins
 " FZF plugins
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }  " Install fuzzy finder binary
+"Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }  " Install fuzzy finder binary
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'yuki-ycino/fzf-preview.vim', { 'branch': 'release/remote', 'do': ':UpdateRemotePlugins' }
 Plug 'junegunn/fzf.vim'  " Enable fuzzy finder in Vim
 "}}
@@ -558,6 +559,10 @@ nnoremap <silent> <C-b> :NERDTreeToggle<CR>
 
 " Use Ctrl-P to open the fuzzy file opener
 nnoremap <C-p> :Files<cr>
+
+" For convenience, we can add shortcut mappings for the above commands:
+nnoremap <silent> <leader>f :FZF<cr>
+nnoremap <silent> <leader>F :FZF ~<cr>
 
 let g:fzf_action = {
   \ 'ctrl-t': 'tab split',
