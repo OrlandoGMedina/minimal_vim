@@ -1,3 +1,57 @@
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"        _   _       _                  _____             __ _               "
+"       | \ | |     (_)                / ____|           / _(_)              "
+"       |  \| |_   ___ _ __ ___       | |     ___  _ __ | |_ _  __ _         "
+"       | . ` \ \ / / | '_ ` _ \      | |    / _ \| '_ \|  _| |/ _` |        "
+"       | |\  |\ V /| | | | | | |     | |___| (_) | | | | | | | (_| |        "
+"       |_| \_| \_/ |_|_| |_| |_|      \_____\___/|_| |_|_| |_|\__, |        "
+"                                                               __/ |        "
+"                                                              |___/         "
+"                                                                            "
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" The above ASCII art is generated using service provided in this webpage:
+" https://www.kammerl.de/ascii/AsciiSignature.php.
+
+"{ Header and Licence
+"{{ header info
+" Description: This is my personal Neovim configuration supporting Mac, Linux
+" and Windows, with various plugins configured. This configuration evolves as
+" I learn more about Nvim and becomes more proficient in using Nvim. Since it
+" is very long (more than 1000 lines!), you should read it carefully and take
+" only the settings and options that suits you. I would not recommend cloning
+" this repo and replace your own config. Good configurations are personal,
+" built over time with a lot of polish.
+" Author: Jie-dong Hao
+" Email: jdhao@hotmail.com
+"}}
+
+"{{ License: MIT License
+"
+" Copyright (c) 2018-2021 Jie-dong Hao
+"
+" Permission is hereby granted, free of charge, to any person obtaining a copy
+" of this software and associated documentation files (the "Software"), to
+" deal in the Software without restriction, including without limitation the
+" rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+" sell copies of the Software, and to permit persons to whom the Software is
+" furnished to do so, subject to the following conditions:
+"
+" The above copyright notice and this permission notice shall be included in
+" all copies or substantial portions of the Software.
+"
+" THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+" IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+" FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+" AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+" LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+" FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+" IN THE SOFTWARE.
+"}}
+"}
+
+
+
 set encoding=utf-8
 scriptencoding utf-8
 
@@ -8,9 +62,15 @@ scriptencoding utf-8
 " - For Neovim: stdpath('data') . '/plugged'
 " - Avoid using standard Vim directory names like 'plugin'
 call plug#begin('~/.vim/plugged')
+
+"{{ wVimwiki related plugins
 " Make sure you use single quotes
 Plug 'vimwiki/vimwiki'
 " Plug 'tbabej/taskwiki'
+"}}
+
+
+"{{ Markdown Editing related plugins
 
 " Markdown editing
 " When we are editing Markdown files, it is nice to have some code snippets
@@ -52,8 +112,11 @@ Plug 'vim-pandoc/vim-pandoc-syntax'
 " if you don't have node and yarn, use pre build
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }}
 "
+"}}
+
 " Plug 'tomasr/molokai'
 " from Luke
+
 Plug 'tpope/vim-surround'
 Plug 'preservim/nerdtree'
 Plug 'jreybert/vimagit'
@@ -66,6 +129,14 @@ if has("autocmd")
   filetype plugin indent on
 endif
 "}
+
+"{{ FZF related plugins
+" FZF plugins
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }  " Install fuzzy finder binary
+Plug 'yuki-ycino/fzf-preview.vim', { 'branch': 'release/remote', 'do': ':UpdateRemotePlugins' }
+Plug 'junegunn/fzf.vim'  " Enable fuzzy finder in Vim
+"}}
+
 
 "{ Builtin optional plugins
 " Activate matchit plugin
@@ -413,6 +484,7 @@ autocmd! User GoyoEnter Limelight
 autocmd! User GoyoLeave Limelight!
 " when you turn on/off goyo, limelight will also be turn on/off.
 
+" Markdonw
 " UltiSnips
 " We need to set up UltiSnips to use it. The following is an example setting:
 "
@@ -477,6 +549,60 @@ let g:vim_markdown_json_frontmatter = 1  " for JSON format
 " Here is my setting for this plugin:
 " do not close the preview tab when switching to other buffers
 let g:mkdp_auto_close = 0
+
+" FZF
+let g:fzf_tags_command = 'ctags -R'
+" Border color
+let g:fzf_layout = {'up':'~90%', 'window': { 'width': 0.8, 'height': 0.8,'yoffset':0.5,'xoffset': 0.5, 'highlight': 'Todo', 'border': 'sharp' } }
+
+let $FZF_DEFAULT_OPTS = '--layout=reverse --inline-info'
+let $FZF_DEFAULT_COMMAND="rg --files --hidden --glob '!.git/**'"
+"-g '!{node_modules,.git}'
+
+" Customize fzf colors to match your color scheme
+let g:fzf_colors =
+\ { 'fg':      ['fg', 'Normal'],
+  \ 'bg':      ['bg', 'Normal'],
+  \ 'hl':      ['fg', 'Comment'],
+  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+  \ 'hl+':     ['fg', 'Statement'],
+  \ 'info':    ['fg', 'PreProc'],
+  \ 'border':  ['fg', 'Ignore'],
+  \ 'prompt':  ['fg', 'Conditional'],
+  \ 'pointer': ['fg', 'Exception'],
+  \ 'marker':  ['fg', 'Keyword'],
+  \ 'spinner': ['fg', 'Label'],
+  \ 'header':  ['fg', 'Comment'] }
+
+" Get Files
+command! -bang -nargs=? -complete=dir Files
+    \ call fzf#vim#files(<q-args>, fzf#vim#with_preview({'options': ['--layout=reverse', '--inline-info']}), <bang>0)
+
+" Make Ripgrep ONLY search file contents and not filenames
+command! -bang -nargs=* Rg
+  \ call fzf#vim#grep(
+  \   'rg --column --line-number --hidden --smart-case --no-heading --color=always '.shellescape(<q-args>), 1,
+  \   <bang>0 ? fzf#vim#with_preview({'options': '--delimiter : --nth 4..'}, 'up:60%')
+  \           : fzf#vim#with_preview({'options': '--delimiter : --nth 4.. -e'}, 'right:50%', '?'),
+  \   <bang>0)
+
+" Ripgrep advanced
+function! RipgrepFzf(query, fullscreen)
+  let command_fmt = 'rg --column --line-number --no-heading --color=always --smart-case %s || true'
+  let initial_command = printf(command_fmt, shellescape(a:query))
+  let reload_command = printf(command_fmt, '{q}')
+  let spec = {'options': ['--phony', '--query', a:query, '--bind', 'change:reload:'.reload_command]}
+  call fzf#vim#grep(initial_command, 1, fzf#vim#with_preview(spec), a:fullscreen)
+endfunction
+
+command! -nargs=* -bang RG call RipgrepFzf(<q-args>, <bang>0)
+
+" Git grep
+command! -bang -nargs=* GGrep
+  \ call fzf#vim#grep(
+  \   'git grep --line-number '.shellescape(<q-args>), 0,
+  \   fzf#vim#with_preview({'dir': systemlist('git rev-parse --show-toplevel')[0]}), <bang>0)
 "}
 
 "{ Auto commands
